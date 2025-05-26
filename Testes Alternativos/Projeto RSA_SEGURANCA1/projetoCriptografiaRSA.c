@@ -2,14 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <direct.h>
-#define mkdir_p(dir) _mkdir(dir)
-#else
-#include <sys/stat.h>
-#define mkdir_p(dir) mkdir(dir, 0755)
-#endif
-
 unsigned long long calcular_potencia_modular(unsigned long long base, unsigned long long exp, unsigned long long mod)
 {
     unsigned long long resultado = 1;
@@ -237,18 +229,16 @@ void gerar_chave_publica()
         return;
     }
 
-    mkdir_p("Chaves Publicas");
-
-    FILE *arquivo = fopen("Chaves Publicas/chave_publica.txt", "w");
+    FILE *arquivo = fopen("chave_publica.txt", "w");
     if (arquivo)
     {
         fprintf(arquivo, "n = %llu e = %llu", n, e);
         fclose(arquivo);
-        printf("Chave pública salva em Chaves Publicas/chave_publica.txt\n");
+        printf("Chave pública gerada e salva em chave_publica.txt\n");
     }
     else
     {
-        printf("Erro ao criar arquivo de chave pública!\n");
+        printf("Erro ao criar arquivo chave_publica.txt\n");
     }
 }
 
@@ -264,19 +254,17 @@ void encriptar()
     printf("Digite a mensagem para encriptar: ");
     scanf(" %[^\n]", mensagem);
 
-    mkdir_p("Mensagens");
-
-    FILE *arquivo = fopen("Mensagens/mensagem_encriptada.txt", "w");
+    FILE *arquivo = fopen("mensagem_encriptada.txt", "w");
     if (arquivo)
     {
         for (int i = 0; mensagem[i] != '\0'; i++)
         {
-            unsigned long long caractere = converter_caractere(mensagem[i]);
-            unsigned long long caractere_encriptado = calcular_potencia_modular(caractere, e, n);
+            unsigned long long caractere = converter_caractere(mensagem[i]);                      // FUNCAO PARA CONVERTER NA TABELA AMORIN
+            unsigned long long caractere_encriptado = calcular_potencia_modular(caractere, e, n); // FUNCAO calcular_potencia_modular E O REAL ENCRIPITADOR
             fprintf(arquivo, "%llu ", caractere_encriptado);
         }
         fclose(arquivo);
-        printf("Mensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
+        printf("Mensagem encriptada salva em mensagem_encriptada.txt\n");
     }
     else
     {
@@ -308,23 +296,21 @@ void desencriptar()
     printf("Digite a mensagem encriptada (números separados por espaço): ");
     scanf(" %[^\n]", mensagem_encriptada);
 
-    mkdir_p("Mensagens");
-
-    FILE *arquivo = fopen("Mensagens/mensagem_desencriptada.txt", "w");
+    FILE *arquivo = fopen("mensagem_desencriptada.txt", "w");
     if (arquivo)
     {
         char *token = strtok(mensagem_encriptada, " ");
         while (token != NULL)
         {
             unsigned long long numero = strtoull(token, NULL, 10);
-            unsigned long long resultado = calcular_potencia_modular(numero, d, n);
+            unsigned long long resultado = calcular_potencia_modular(numero, d, n); // unica diferenca entre codificar e decodificar na troca do e pelo d
             char caractere = converter_numero(resultado);
             fprintf(arquivo, "%c", caractere);
             printf("%c", caractere);
             token = strtok(NULL, " ");
         }
         fclose(arquivo);
-        printf("\nMensagem desencriptada salva em Mensagens/mensagem_desencriptada.txt\n");
+        printf("\nMensagem desencriptada salva em mensagem_desencriptada.txt\n");
     }
     else
     {
