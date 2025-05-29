@@ -2,19 +2,138 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned long long calcular_potencia_modular(unsigned long long base, unsigned long long exp, unsigned long long mod)
+#ifdef _WIN32
+#include <direct.h>
+#define mkdir_p(dir) _mkdir(dir)
+#else
+#include <sys/stat.h>
+#define mkdir_p(dir) mkdir(dir, 0755)
+#endif
+
+unsigned long long converter_caractere(char c)
 {
-    unsigned long long resultado = 1;
-    while (exp > 0)
+    switch (c)
     {
-        if (exp % 2 == 1)
-        {
-            resultado = (resultado * base) % mod;
-        }
-        base = (base * base) % mod;
-        exp /= 2;
+    case 'A':
+        return 2;
+    case 'B':
+        return 3;
+    case 'C':
+        return 4;
+    case 'D':
+        return 5;
+    case 'E':
+        return 6;
+    case 'F':
+        return 7;
+    case 'G':
+        return 8;
+    case 'H':
+        return 9;
+    case 'I':
+        return 10;
+    case 'J':
+        return 11;
+    case 'K':
+        return 12;
+    case 'L':
+        return 13;
+    case 'M':
+        return 14;
+    case 'N':
+        return 15;
+    case 'O':
+        return 16;
+    case 'P':
+        return 17;
+    case 'Q':
+        return 18;
+    case 'R':
+        return 19;
+    case 'S':
+        return 20;
+    case 'T':
+        return 21;
+    case 'U':
+        return 22;
+    case 'V':
+        return 23;
+    case 'W':
+        return 24;
+    case 'X':
+        return 25;
+    case 'Y':
+        return 26;
+    case 'Z':
+        return 27;
+    case ' ':
+        return 28;
+    default:
+        return 0;
     }
-    return resultado;
+}
+
+char converter_numero(unsigned long long num)
+{
+    switch (num)
+    {
+    case 2:
+        return 'A';
+    case 3:
+        return 'B';
+    case 4:
+        return 'C';
+    case 5:
+        return 'D';
+    case 6:
+        return 'E';
+    case 7:
+        return 'F';
+    case 8:
+        return 'G';
+    case 9:
+        return 'H';
+    case 10:
+        return 'I';
+    case 11:
+        return 'J';
+    case 12:
+        return 'K';
+    case 13:
+        return 'L';
+    case 14:
+        return 'M';
+    case 15:
+        return 'N';
+    case 16:
+        return 'O';
+    case 17:
+        return 'P';
+    case 18:
+        return 'Q';
+    case 19:
+        return 'R';
+    case 20:
+        return 'S';
+    case 21:
+        return 'T';
+    case 22:
+        return 'U';
+    case 23:
+        return 'V';
+    case 24:
+        return 'W';
+    case 25:
+        return 'X';
+    case 26:
+        return 'Y';
+    case 27:
+        return 'Z';
+    case 28:
+        return ' ';
+    default:
+        return '?';
+    }
 }
 
 int eh_primo(unsigned long long n)
@@ -31,66 +150,82 @@ int eh_primo(unsigned long long n)
         if (n % i == 0 || n % (i + 2) == 0)
             return 0;
     }
+
     return 1;
 }
 
-unsigned long long calcular_mdc(unsigned long long a, unsigned long long b)
+unsigned long long calcular_mdc(unsigned long long e, unsigned long long a)
 {
-    while (b != 0)
+    while (a != 0)
     {
-        unsigned long long temp = b;
-        b = a % b;
-        a = temp;
+        unsigned long long temp = a;
+
+        a = e % a;
+        e = temp;
     }
-    return a;
+
+    return e;
 }
 
-unsigned long long calcular_inverso_modular(unsigned long long e, unsigned long long phi)
+// int mdc(int a, int b) {
+
+//     if (b == 0) {
+//         return a;
+//     }
+
+//     else {
+//         return mdc(b, a % b);
+//     }
+// }
+
+unsigned long long calcular_inverso_modular(unsigned long long e, unsigned long long a)
 {
-    unsigned long long t = 0, new_t = 1;
-    unsigned long long r = phi, new_r = e;
+    long long d = 0, aux_d = 1;
+    long long r = (long long)a, aux_r = (long long)e;
 
-    while (new_r != 0)
+    while (aux_r != 0)
     {
-        unsigned long long quociente = r / new_r;
-        unsigned long long temp_t = t - quociente * new_t;
-        t = new_t;
-        new_t = temp_t;
+        // monta o algoritmo de euclides
+        long long q = r / aux_r;
+        long long tmp = d - q * aux_d;
+        d = aux_d;
+        aux_d = tmp;
 
-        unsigned long long temp_r = r - quociente * new_r;
-        r = new_r;
-        new_r = temp_r;
+        //"desfaz o algoritmo de euclides" = monta a congruencia linear
+        long long tmp2 = r - q * aux_r;
+        r = aux_r;
+        aux_r = tmp2;
     }
 
     if (r > 1)
-        return 0; // Inverso não existe
+        return 0;
+    if (d < 0)
+        d += a;
 
-    if (t < 0)
-        t += phi;
-    return t;
+    return (unsigned long long)d;
 }
 
-unsigned long long converter_caractere(char c)
+unsigned long long calcular_potencia_modular(unsigned long long base, unsigned long long exp, unsigned long long mod)
 {
-    if (c >= 'a' && c <= 'z')
-        return c - 'a' + 2;
-    if (c == ' ')
-        return 28;
-    return 0; // Caractere inválido
-}
+    unsigned long long resultado = 1;
 
-char converter_numero(unsigned long long num)
-{
-    if (num >= 2 && num <= 27)
-        return (char)(num + 'a' - 2);
-    if (num == 28)
-        return ' ';
-    return '?'; // Caso de erro
+    while (exp > 0)
+    {
+        if (exp % 2 == 1)
+        {
+            resultado = (resultado * base) % mod;
+        }
+
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+
+    return resultado;
 }
 
 void gerar_chave_publica()
 {
-    unsigned long long p, q, n, phi, e, d;
+    unsigned long long p, q, n, a, e, d;
 
     printf("Digite o valor de P (primo): ");
     scanf("%llu", &p);
@@ -101,36 +236,41 @@ void gerar_chave_publica()
 
     if (!eh_primo(p) || !eh_primo(q))
     {
-        printf("Erro: P e Q devem ser primos!\n");
+        printf("\nErro: P e Q devem ser primos!\n");
         return;
     }
 
     n = p * q;
-    phi = (p - 1) * (q - 1);
+    a = (p - 1) * (q - 1);
 
-    if (calcular_mdc(e, phi) != 1)
+    if (calcular_mdc(e, a) != 1)
     {
-        printf("Erro: E deve ser coprimo com (P-1)*(Q-1)!\n");
+        printf("\nErro: E deve ser coprimo com a = (P-1)*(Q-1)!\n");
         return;
     }
 
-    d = calcular_inverso_modular(e, phi);
+    d = calcular_inverso_modular(e, a);
+
     if (d == 0)
     {
-        printf("Erro: não foi possível calcular o inverso modular!\n");
+        printf("\nErro: não foi possível calcular o inverso modular!\n");
         return;
     }
 
-    FILE *arquivo = fopen("chave_publica.txt", "w");
+    mkdir_p("Chaves Publicas");
+
+    FILE *arquivo = fopen("Chaves Publicas/chave_publica.txt", "w");
+
     if (arquivo)
     {
-        fprintf(arquivo, "%llu %llu", n, e);
+        fprintf(arquivo, "n = %llu e = %llu", n, e);
         fclose(arquivo);
-        printf("Chave pública gerada e salva em chave_publica.txt\n");
+        printf("\nChave pública salva em Chaves Publicas/chave_publica.txt\n");
     }
+
     else
     {
-        printf("Erro ao criar arquivo chave_publica.txt\n");
+        printf("\nErro ao criar arquivo de chave pública!\n");
     }
 }
 
@@ -146,7 +286,10 @@ void encriptar()
     printf("Digite a mensagem para encriptar: ");
     scanf(" %[^\n]", mensagem);
 
-    FILE *arquivo = fopen("mensagem_encriptada.txt", "w");
+    mkdir_p("Mensagens");
+
+    FILE *arquivo = fopen("Mensagens/mensagem_encriptada.txt", "w");
+
     if (arquivo)
     {
         for (int i = 0; mensagem[i] != '\0'; i++)
@@ -155,18 +298,20 @@ void encriptar()
             unsigned long long caractere_encriptado = calcular_potencia_modular(caractere, e, n);
             fprintf(arquivo, "%llu ", caractere_encriptado);
         }
+
         fclose(arquivo);
-        printf("Mensagem encriptada salva em mensagem_encriptada.txt\n");
+        printf("\nMensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
     }
+
     else
     {
-        printf("Erro ao criar arquivo mensagem_encriptada.txt\n");
+        printf("\nErro ao criar arquivo mensagem_encriptada.txt\n");
     }
 }
 
 void desencriptar()
 {
-    unsigned long long p, q, e, n, phi, d;
+    unsigned long long p, q, e, n, a, d;
     char mensagem_encriptada[10000];
 
     printf("Digite o valor de P: ");
@@ -177,21 +322,26 @@ void desencriptar()
     scanf("%llu", &e);
 
     n = p * q;
-    phi = (p - 1) * (q - 1);
-    d = calcular_inverso_modular(e, phi);
+    a = (p - 1) * (q - 1);
+    d = calcular_inverso_modular(e, a);
+
     if (d == 0)
     {
-        printf("Erro ao calcular D!\n");
+        printf("\nErro ao calcular calcular o inverso modular (d)!\n");
         return;
     }
 
     printf("Digite a mensagem encriptada (números separados por espaço): ");
     scanf(" %[^\n]", mensagem_encriptada);
 
-    FILE *arquivo = fopen("mensagem_desencriptada.txt", "w");
+    mkdir_p("Mensagens");
+
+    FILE *arquivo = fopen("Mensagens/mensagem_desencriptada.txt", "w");
+
     if (arquivo)
     {
         char *token = strtok(mensagem_encriptada, " ");
+
         while (token != NULL)
         {
             unsigned long long numero = strtoull(token, NULL, 10);
@@ -202,11 +352,12 @@ void desencriptar()
             token = strtok(NULL, " ");
         }
         fclose(arquivo);
-        printf("\nMensagem desencriptada salva em mensagem_desencriptada.txt\n");
+        printf("\nMensagem desencriptada salva em Mensagens/mensagem_desencriptada.txt\n");
     }
+
     else
     {
-        printf("Erro ao criar arquivo mensagem_desencriptada.txt\n");
+        printf("\nErro ao criar arquivo mensagem_desencriptada.txt\n");
     }
 }
 
@@ -221,7 +372,7 @@ int main()
         printf("2. Encriptar mensagem\n");
         printf("3. Desencriptar mensagem\n");
         printf("4. Sair\n");
-        printf("Escolha uma opção: ");
+        printf("\nEscolha uma opção: \n");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -236,11 +387,12 @@ int main()
             desencriptar();
             break;
         case 4:
-            printf("Saindo...\n");
+            printf("\nSaindo...\n");
             break;
         default:
-            printf("Opção inválida!\n");
+            printf("\nOpção inválida!\n");
         }
+
     } while (opcao != 4);
 
     return 0;

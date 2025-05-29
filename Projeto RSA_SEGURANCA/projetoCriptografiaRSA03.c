@@ -227,7 +227,7 @@ void gerar_chave_publica()
 {
     unsigned long long p, q, n, a, e, d;
 
-    printf("\nDigite o valor de P (primo): ");
+    printf("Digite o valor de P (primo): ");
     scanf("%llu", &p);
     printf("Digite o valor de Q (primo): ");
     scanf("%llu", &q);
@@ -236,7 +236,7 @@ void gerar_chave_publica()
 
     if (!eh_primo(p) || !eh_primo(q))
     {
-        printf("\nErro: P e Q devem ser primos!\n");
+        printf("Erro: P e Q devem ser primos!\n");
         return;
     }
 
@@ -245,7 +245,7 @@ void gerar_chave_publica()
 
     if (calcular_mdc(e, a) != 1)
     {
-        printf("\nErro: E deve ser coprimo com a = (P-1)*(Q-1)!\n");
+        printf("Erro: E deve ser coprimo com a = (P-1)*(Q-1)!\n");
         return;
     }
 
@@ -253,7 +253,7 @@ void gerar_chave_publica()
 
     if (d == 0)
     {
-        printf("\nErro: não foi possível calcular o inverso modular!\n");
+        printf("Erro: não foi possível calcular o inverso modular!\n");
         return;
     }
 
@@ -265,12 +265,12 @@ void gerar_chave_publica()
     {
         fprintf(arquivo, "n = %llu e = %llu", n, e);
         fclose(arquivo);
-        printf("\nChave pública salva em Chaves Publicas/chave_publica.txt\n");
+        printf("Chave pública salva em Chaves Publicas/chave_publica.txt\n");
     }
 
     else
     {
-        printf("\nErro ao criar arquivo de chave pública!\n");
+        printf("Erro ao criar arquivo de chave pública!\n");
     }
 }
 
@@ -279,7 +279,7 @@ void encriptar()
     unsigned long long n, e;
     char mensagem[1000];
 
-    printf("\nDigite o valor de N: ");
+    printf("Digite o valor de N: ");
     scanf("%llu", &n);
     printf("Digite o valor de E: ");
     scanf("%llu", &e);
@@ -300,12 +300,12 @@ void encriptar()
         }
 
         fclose(arquivo);
-        printf("\nMensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
+        printf("Mensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
     }
 
     else
     {
-        printf("\nErro ao criar arquivo mensagem_encriptada.txt\n");
+        printf("Erro ao criar arquivo mensagem_encriptada.txt\n");
     }
 }
 
@@ -314,7 +314,7 @@ void desencriptar()
     unsigned long long p, q, e, n, a, d;
     char mensagem_encriptada[10000];
 
-    printf("\nDigite o valor de P: ");
+    printf("Digite o valor de P: ");
     scanf("%llu", &p);
     printf("Digite o valor de Q: ");
     scanf("%llu", &q);
@@ -327,11 +327,11 @@ void desencriptar()
 
     if (d == 0)
     {
-        printf("\nErro ao calcular calcular o inverso modular (d)!\n");
+        printf("Erro ao calcular calcular o inverso modular (d)!\n");
         return;
     }
 
-    printf("Digite a mensagem encriptada: ");
+    printf("Digite a mensagem encriptada (números separados por espaço): ");
     scanf(" %[^\n]", mensagem_encriptada);
 
     mkdir_p("Mensagens");
@@ -348,18 +348,16 @@ void desencriptar()
             unsigned long long resultado = calcular_potencia_modular(numero, d, n);
             char caractere = converter_numero(resultado);
             fprintf(arquivo, "%c", caractere);
-            
+            printf("%c", caractere);
             token = strtok(NULL, " ");
         }
-
         fclose(arquivo);
-
         printf("\nMensagem desencriptada salva em Mensagens/mensagem_desencriptada.txt\n");
     }
 
     else
     {
-        printf("\nErro ao criar arquivo mensagem_desencriptada.txt\n");
+        printf("Erro ao criar arquivo mensagem_desencriptada.txt\n");
     }
 }
 
@@ -374,7 +372,7 @@ int main()
         printf("2. Encriptar mensagem\n");
         printf("3. Desencriptar mensagem\n");
         printf("4. Sair\n");
-        printf("\nEscolha uma opção: ");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -389,10 +387,10 @@ int main()
             desencriptar();
             break;
         case 4:
-            printf("\nSaindo...\n");
+            printf("Saindo...\n");
             break;
         default:
-            printf("\nOpção inválida!\n");
+            printf("Opção inválida!\n");
         }
 
     } while (opcao != 4);

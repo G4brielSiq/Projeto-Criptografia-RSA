@@ -181,20 +181,18 @@ unsigned long long calcular_mdc(unsigned long long e, unsigned long long a)
 unsigned long long calcular_inverso_modular(unsigned long long e, unsigned long long a)
 {
     long long d = 0, aux_d = 1;
-    long long r = (long long)a, aux_r = (long long)e;
+    long long r = (long long)a, resto_r = (long long)e;
 
-    while (aux_r != 0)
+    while (resto_r != 0)
     {
-        // monta o algoritmo de euclides
-        long long q = r / aux_r;
+        long long q = r / resto_r;
         long long tmp = d - q * aux_d;
         d = aux_d;
         aux_d = tmp;
 
-        //"desfaz o algoritmo de euclides" = monta a congruencia linear
-        long long tmp2 = r - q * aux_r;
-        r = aux_r;
-        aux_r = tmp2;
+        tmp = r - q * resto_r; // algoritimo de euclides
+        r = resto_r;
+        resto_r = tmp;
     }
 
     if (r > 1)
@@ -227,7 +225,7 @@ void gerar_chave_publica()
 {
     unsigned long long p, q, n, a, e, d;
 
-    printf("\nDigite o valor de P (primo): ");
+    printf("Digite o valor de P (primo): ");
     scanf("%llu", &p);
     printf("Digite o valor de Q (primo): ");
     scanf("%llu", &q);
@@ -279,7 +277,7 @@ void encriptar()
     unsigned long long n, e;
     char mensagem[1000];
 
-    printf("\nDigite o valor de N: ");
+    printf("Digite o valor de N: ");
     scanf("%llu", &n);
     printf("Digite o valor de E: ");
     scanf("%llu", &e);
@@ -302,7 +300,7 @@ void encriptar()
         fclose(arquivo);
         printf("\nMensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
     }
-
+    
     else
     {
         printf("\nErro ao criar arquivo mensagem_encriptada.txt\n");
@@ -314,7 +312,7 @@ void desencriptar()
     unsigned long long p, q, e, n, a, d;
     char mensagem_encriptada[10000];
 
-    printf("\nDigite o valor de P: ");
+    printf("Digite o valor de P: ");
     scanf("%llu", &p);
     printf("Digite o valor de Q: ");
     scanf("%llu", &q);
@@ -331,7 +329,7 @@ void desencriptar()
         return;
     }
 
-    printf("Digite a mensagem encriptada: ");
+    printf("Digite a mensagem encriptada (números separados por espaço): ");
     scanf(" %[^\n]", mensagem_encriptada);
 
     mkdir_p("Mensagens");
@@ -341,19 +339,17 @@ void desencriptar()
     if (arquivo)
     {
         char *token = strtok(mensagem_encriptada, " ");
-
+        
         while (token != NULL)
         {
             unsigned long long numero = strtoull(token, NULL, 10);
             unsigned long long resultado = calcular_potencia_modular(numero, d, n);
             char caractere = converter_numero(resultado);
             fprintf(arquivo, "%c", caractere);
-            
+            printf("%c", caractere);
             token = strtok(NULL, " ");
         }
-
         fclose(arquivo);
-
         printf("\nMensagem desencriptada salva em Mensagens/mensagem_desencriptada.txt\n");
     }
 
@@ -374,7 +370,7 @@ int main()
         printf("2. Encriptar mensagem\n");
         printf("3. Desencriptar mensagem\n");
         printf("4. Sair\n");
-        printf("\nEscolha uma opção: ");
+        printf("\nEscolha uma opção: \n");
         scanf("%d", &opcao);
 
         switch (opcao)
