@@ -181,18 +181,20 @@ unsigned long long calcular_mdc(unsigned long long e, unsigned long long a)
 unsigned long long calcular_inverso_modular(unsigned long long e, unsigned long long a)
 {
     long long d = 0, aux_d = 1;
-    long long r = (long long)a, resto_r = (long long)e;
+    long long r = (long long)a, aux_r = (long long)e;
 
-    while (resto_r != 0)
+    while (aux_r != 0)
     {
-        long long q = r / resto_r;
+        // monta o algoritmo de euclides
+        long long q = r / aux_r;
         long long tmp = d - q * aux_d;
         d = aux_d;
         aux_d = tmp;
 
-        tmp = r - q * resto_r; // algoritimo de euclides
-        r = resto_r;
-        resto_r = tmp;
+        //"desfaz o algoritmo de euclides" = monta a congruencia linear
+        long long tmp2 = r - q * aux_r;
+        r = aux_r;
+        aux_r = tmp2;
     }
 
     if (r > 1)
@@ -234,7 +236,7 @@ void gerar_chave_publica()
 
     if (!eh_primo(p) || !eh_primo(q))
     {
-        printf("\nErro: P e Q devem ser primos!\n");
+       printf("\nErro: P e Q devem ser primos!\n");
         return;
     }
 
@@ -300,7 +302,7 @@ void encriptar()
         fclose(arquivo);
         printf("\nMensagem encriptada salva em Mensagens/mensagem_encriptada.txt\n");
     }
-    
+
     else
     {
         printf("\nErro ao criar arquivo mensagem_encriptada.txt\n");
@@ -339,7 +341,7 @@ void desencriptar()
     if (arquivo)
     {
         char *token = strtok(mensagem_encriptada, " ");
-        
+
         while (token != NULL)
         {
             unsigned long long numero = strtoull(token, NULL, 10);
